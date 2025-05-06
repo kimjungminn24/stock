@@ -20,3 +20,27 @@ latch.
 
 await();      // 대기
 ```
+
+## 3. DB를 이용한 동시성 제어 방법
+
+1. Pessimistic Lock (비관적 락)
+
+- 실제로 데이터에 Lock을 걸어서 정합성을 맞추는 방법
+- exclusive lock(배타적락)을 걸게 되면 다른 트랜잭션에서는 lock이 해제되기 전에 데이터를 가져갈 수 없게 된다.
+- 데드락이 걸릴 수 있기 때문에 조심해야한다.
+- 데드락 : 둘 이상의 프로세스가 서로 다른 자원을 점유한채, 상대방의 자원을 기다리는 상황
+- 충돌이 많지 않다면, 락을 걸지 않는 낙관적 락보다 오히려 성능이 떨어질 수 있음 (충돌 가능성이 높은 환경이 좋다)
+
+```java
+//jpa 사용방법
+@Lock(LockModeType.PESSIMISTIC_WRITE)
+```
+
+```sql
+select s1_0.id,s1_0.product_id,s1_0.quantity
+from stock s1_0
+where s1_0.id=?
+for update # 해당 행에 락을 걸고 완료전까지 다른 트랜잭션이 읽을수는 있어도 수정하지 못하게 막는다.
+
+```
+
